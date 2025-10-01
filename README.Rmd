@@ -17,3 +17,50 @@ Include your answers in this document (Rmd file). Make sure that it knits proper
 
 All submissions to the github repo will be automatically uploaded for grading once the due date is passed.
 Submit a link to your repository on Canvas (only one submission per team) to signal to the instructors that you are done with your submission.
+
+# Step 1 
+This code explores the ames dataset by first displaying the first few rows with head(ames) to see what variables are included and checking the type of the dataset with typeof(ames). Each variable individually: Parcel ID is a unique 10-digit identifier for each property, Address includes the house number, street, and city, Style describes the house style or number of stories, and Occupancy indicates how many people live in the house. Sale Date records when the house was sold, and Sale Price shows the sale price, which ranges from $0 to $795,000. Multi Sale indicates whether the house has been sold more than once, though most entries are missing, and Year Built records the construction year. We also looked at lot and house size variables: Acres shows the lot size in acres, TotalLivingArea (sf) measures the total living area in square feet, Bedrooms counts the number of bedrooms, FinishedBsmtArea (sf) gives the finished basement area, and LotArea (sf) represents the total lot area. Additional features include AC, indicating the presence of air conditioning, FirePlace, indicating whether the house has a fireplace, and Neighborhood, specifying the neighborhood. To handle missing values, a new dataset my_df_no_na is created with na.omit(ames), allowing the code to calculate numeric ranges for variables like total living area, bedrooms, and finished basement area.
+
+# Step 2 & 3: Area of Interest = Sale Price
+```{r, SP }
+ames$`Sale Price`
+my_df_no_na <- na.omit(ames)
+range(my_df_no_na$`Sale Price`) #range = (0,795000)
+
+ames_counts <- ames %>%
+  count(`Sale Price`)  # creates a column `n` with counts
+
+ggplot(ames_counts, aes(x = `Sale Price`, y = n)) +
+  geom_point()
+```
+
+# Step 4
+Betsy's work:
+```{r, }
+range(ames$Acres, na.rm = TRUE)
+```
+The lot size (Acres) ranges from 0.02 to about 2.3 acres.
+Most houses are on small lots, with a few much larger lots (possible outliers).
+
+```{r, }
+ggplot(ames, aes(x = Acres)) +
+  geom_histogram(binwidth = 0.05, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Lot Size (Acres)",
+       x = "Acres", y = "Count")
+```
+The distribution is right-skewed: most houses are on small lots (<0.5 acres), and a few properties have very large lots.
+There are some extreme values (outliers) on the high end.
+
+```{r, }
+ggplot(ames, aes(x = Acres, y = `Sale Price`)) +
+  geom_point(alpha = 0.5, color = "blue") +      # make points semi-transparent
+  labs(title = "Sale Price vs Acres",
+       x = "Lot Size (Acres)", y = "Sale Price") +
+  scale_y_continuous(labels = scales::dollar_format())
+
+```
+- There is a positive relationship: houses on larger lots tend to have higher sale prices.
+- Most points cluster at small lot sizes, but a few large-lot houses have much higher sale prices, contributing to the skew in SalePrice.
+- These extreme points may explain some oddities observed in SalePrice, like very high sales.
+
+
