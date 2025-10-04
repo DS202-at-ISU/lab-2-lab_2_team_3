@@ -10,7 +10,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Lab report #1
-
 Follow the instructions posted at https://ds202-at-isu.github.io/labs.html for the lab assignment. The work is meant to be finished during the lab time, but you have time until Monday evening to polish things.
 
 Include your answers in this document (Rmd file). Make sure that it knits properly (into the md file). Upload both the Rmd and the md file to your repository.  
@@ -19,20 +18,52 @@ All submissions to the github repo will be automatically uploaded for grading on
 Submit a link to your repository on Canvas (only one submission per team) to signal to the instructors that you are done with your submission.
 
 # Step 1 
+```{r, }
+library(remotes)
+install_github("heike/classdata")
+library(classdata)
+head(ames)
+typeof(ames)
+summary(ames)
+```
+
 This code explores the ames dataset by first displaying the first few rows with head(ames) to see what variables are included and checking the type of the dataset with typeof(ames). Each variable individually: Parcel ID is a unique 10-digit identifier for each property, Address includes the house number, street, and city, Style describes the house style or number of stories, and Occupancy indicates how many people live in the house. Sale Date records when the house was sold, and Sale Price shows the sale price, which ranges from $0 to $795,000. Multi Sale indicates whether the house has been sold more than once, though most entries are missing, and Year Built records the construction year. We also looked at lot and house size variables: Acres shows the lot size in acres, TotalLivingArea (sf) measures the total living area in square feet, Bedrooms counts the number of bedrooms, FinishedBsmtArea (sf) gives the finished basement area, and LotArea (sf) represents the total lot area. Additional features include AC, indicating the presence of air conditioning, FirePlace, indicating whether the house has a fireplace, and Neighborhood, specifying the neighborhood. To handle missing values, a new dataset my_df_no_na is created with na.omit(ames), allowing the code to calculate numeric ranges for variables like total living area, bedrooms, and finished basement area.
 
 # Step 2 & 3: Area of Interest = Sale Price
 ```{r, SP }
-ames$`Sale Price`
-my_df_no_na <- na.omit(ames)
-range(my_df_no_na$`Sale Price`) #range = (0,795000)
+price <- ames$'Sale Price'
+range(price)
+names(ames)
 
-ames_counts <- ames %>%
-  count(`Sale Price`)  # creates a column `n` with counts
+str(ames$`Sale Price`)
 
-ggplot(ames_counts, aes(x = `Sale Price`, y = n)) +
-  geom_point()
+library(ggplot2)
+
+#Histogram of house prices, nearly impossible to see distinctions due to massive range
+ggplot(ames, aes(x = `Sale Price`)) +
+  geom_histogram(binwidth = 50000, fill = "skyblue", color = "black") +
+  labs(
+    title = "Distribution of Sale Prices",
+    x = "Sale Price (USD)",
+    y = "Number of Properties"
+  ) +
+  theme_minimal()
+
+#Histogram with log scale to make trends easier to see. 
+ggplot(subset(ames, `Sale Price` > 0), aes(x = `Sale Price`)) +
+  geom_histogram(bins = 50, fill = "skyblue", color = "black") +
+  scale_x_log10() +
+  labs(
+    title = "Distribution of Sale Prices (Log Scale)",
+    x = "Sale Price (log10 scale)",
+    y = "Number of Properties"
+  ) +
+  theme_minimal()
+
+
 ```
+
+The variable of special interest / focus is certainly the 'Sale Price' variable. The range of this variable is from $0 to $20,500,000.The genereal pattern is a large spike approximately around $150,000 to $350,000 (Difficult to tell for certain).
 
 # Step 4
 Betsy's work:
@@ -48,6 +79,7 @@ ggplot(ames, aes(x = Acres)) +
   labs(title = "Histogram of Lot Size (Acres)",
        x = "Acres", y = "Count")
 ```
+
 The distribution is right-skewed: most houses are on small lots (<0.5 acres), and a few properties have very large lots.
 There are some extreme values (outliers) on the high end.
 
@@ -63,4 +95,38 @@ ggplot(ames, aes(x = Acres, y = `Sale Price`)) +
 - Most points cluster at small lot sizes, but a few large-lot houses have much higher sale prices, contributing to the skew in SalePrice.
 - These extreme points may explain some oddities observed in SalePrice, like very high sales.
 
+Colin's Work: 
+```{r, }
+sqft <- ames$`TotalLivingArea (sf)`
+range(ames$`TotalLivingArea (sf)`, na.rm = TRUE)
 
+#Plot
+ggplot(subset(ames, `TotalLivingArea (sf)` > 0), 
+       aes(x = `TotalLivingArea (sf)`)) +
+  geom_histogram(bins = 40, fill = "lightblue", color = "black") +
+  labs(
+    title = "Distribution of Total Living Area",
+    x = "Total Living Area (sq. ft.)",
+    y = "Number of Properties"
+  ) +
+  theme_minimal()
+```
+
+The variable I chose is "TotalLivingArea (sf)." The range of the variable is 0 to 6,007.
+```{r, }
+#Removed outliers since the most expensive houses made it impossible to see a trend
+ggplot(subset(ames, 
+              `TotalLivingArea (sf)` > 0 & 
+              `Sale Price` > 0 & 
+              `Sale Price` <= 1000000),
+       aes(x = `TotalLivingArea (sf)`, y = `Sale Price`)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  labs(
+    title = "Sale Price vs. Square Footage (Excluding Outliers)",
+    x = "Square Footage",
+    y = "Sale Price"
+  ) +
+  theme_minimal()
+```
+
+The overall pattern is a positive semi-linear relationship such that the sale price increases as the square footage increases. While the oddities don't show up on the chart, the outliers make this relationship much weaker. The most expensive houses aren't necessarily the biggest, they were generally between 500 and 1,500 square feet, which seems incredibly small for how much the houses were sold for. 
