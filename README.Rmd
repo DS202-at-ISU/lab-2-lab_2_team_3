@@ -130,3 +130,26 @@ ggplot(subset(ames,
 ```
 
 The overall pattern is a positive semi-linear relationship such that the sale price increases as the square footage increases. While the oddities don't show up on the chart, the outliers make this relationship much weaker. The most expensive houses aren't necessarily the biggest, they were generally between 500 and 1,500 square feet, which seems incredibly small for how much the houses were sold for. 
+---
+
+### Tirtho's Analysis: Year Built vs Sale Price
+```{r tirtho-yearbuilt}
+# Year Built analysis
+range(ames$YearBuilt, na.rm = TRUE)
+
+# Scatter plot with trend line
+ggplot(ames, aes(x = YearBuilt, y = `Sale Price`)) +
+  geom_point(alpha = 0.4, color = "steelblue") +
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(
+    title = "Sale Price vs. Year Built",
+    subtitle = "Ames Residential Properties",
+    x = "Year Built",
+    y = "Sale Price"
+  ) +
+  theme_minimal()
+
+# Correlation
+cor(ames$YearBuilt, ames$`Sale Price`, use = "complete.obs")
+**My findings:** I chose YearBuilt as my variable. There is a weak positive relationship (r = 0.15) between year built and sale price. While there is some tendency for newer homes to command higher prices, the relationship is weaker than expected, with considerable variation. Some older homes (pre-1950) sell for high prices, likely due to historic value or renovations. Notable outliers include homes built around 2000-2010 selling for $400,000+. The weak correlation suggests that other factors (like square footage, location, or quality) may be more important predictors of sale price than age alone.

@@ -234,8 +234,8 @@ ggplot(ames, aes(x = Acres, y = `Sale Price`)) +
   scale_y_continuous(labels = scales::dollar_format())
 ```
 
-    ## Warning: Removed 89 rows containing missing values or values outside the scale range
-    ## (`geom_point()`).
+    ## Warning: Removed 89 rows containing missing values or values outside the scale
+    ## range (`geom_point()`).
 
 ![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- --> - There is a
 positive relationship: houses on larger lots tend to have higher sale
@@ -289,9 +289,45 @@ ggplot(subset(ames,
 
 ![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
-The overall pattern is a positive semi-linear relationship such that the
-sale price increases as the square footage increases. While the oddities
-don’t show up on the chart, the outliers make this relationship much
-weaker. The most expensive houses aren’t necessarily the biggest, they
-were generally between 500 and 1,500 square feet, which seems incredibly
-small for how much the houses were sold for.
+## The overall pattern is a positive semi-linear relationship such that the sale price increases as the square footage increases. While the oddities don’t show up on the chart, the outliers make this relationship much weaker. The most expensive houses aren’t necessarily the biggest, they were generally between 500 and 1,500 square feet, which seems incredibly small for how much the houses were sold for.
+
+### Tirtho’s Analysis: Year Built vs Sale Price
+
+``` r
+# Year Built analysis
+range(ames$YearBuilt, na.rm = TRUE)
+```
+
+    ## [1]    0 2022
+
+``` r
+# Scatter plot with trend line
+ggplot(ames, aes(x = YearBuilt, y = `Sale Price`)) +
+  geom_point(alpha = 0.4, color = "steelblue") +
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(
+    title = "Sale Price vs. Year Built",
+    subtitle = "Ames Residential Properties",
+    x = "Year Built",
+    y = "Sale Price"
+  ) +
+  theme_minimal()
+```
+
+    ## `geom_smooth()` using formula = 'y ~ x'
+
+    ## Warning: Removed 447 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+
+    ## Warning: Removed 447 rows containing missing values or values outside the scale
+    ## range (`geom_point()`).
+
+![](README_files/figure-gfm/tirtho-yearbuilt-1.png)<!-- -->
+
+``` r
+# Correlation
+cor(ames$YearBuilt, ames$`Sale Price`, use = "complete.obs")
+```
+
+    ## [1] 0.1533749
