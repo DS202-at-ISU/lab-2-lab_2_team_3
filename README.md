@@ -331,3 +331,7 @@ cor(ames$YearBuilt, ames$`Sale Price`, use = "complete.obs")
 ```
 
     ## [1] 0.1533749
+
+``` r
+#My findings: I chose YearBuilt as my variable. There is a weak positive relationship (r = 0.15) between year built and sale price. While there is some tendency for newer homes to command higher prices, the relationship is weaker than expected, with considerable variation. Some older homes (pre-1950) sell for high prices, likely due to historic value or renovations. Notable outliers include homes built around 2000-2010 selling for $400,000+. The weak correlation suggests that other factors (like square footage, location, or quality) may be more important predictors of sale price than age alone.
+```
